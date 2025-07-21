@@ -1,10 +1,5 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { persistor, store } from "@/redux/store";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -29,15 +24,11 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack
-            initialRouteName="auth/onboarding"
-            screenOptions={{ headerShown: false }}
-          ></Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        <Stack
+          initialRouteName="auth/onboarding"
+          screenOptions={{ headerShown: false }}
+        />
+        <StatusBar style="auto" />
       </PersistGate>
     </Provider>
   );

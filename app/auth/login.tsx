@@ -2,7 +2,7 @@ import CustomButton from "@/components/CustomButton";
 import { color } from "@/constants/Colors";
 import { svgIcon } from "@/constants/Images";
 import Octicons from "@expo/vector-icons/Octicons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -18,8 +18,8 @@ export default function AuthScreen() {
   const Logo = svgIcon.Logo;
   const Apple = svgIcon.Apple;
   const Google = svgIcon.Google;
-
-  const [isSignup, setIsSignup] = useState(false);
+  const { mode } = useLocalSearchParams();
+  const [isSignup, setIsSignup] = useState(mode === "signup");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -77,9 +77,9 @@ export default function TestResults() {
 
         {/* Statistics Header */}
         <View style={styles.statisticsHeader}>
-          <Text style={styles.statisticsTitle}>Statistics</Text>
+          <Text style={styles.statisticsTitle}>Statistics </Text>
           <Text style={styles.statisticsSubtitle}>
-            Click on bars to see people
+            ( Click on bars to see people )
           </Text>
         </View>
 
@@ -233,6 +233,9 @@ const styles = StyleSheet.create({
     fontFamily: "SemiBold",
   },
   statisticsHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   statisticsTitle: {
@@ -302,8 +305,8 @@ const styles = StyleSheet.create({
   },
   percentageText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
+    fontFamily: "SemiBold",
+    color: color.black,
     minWidth: 35,
     textAlign: "right",
   },
@@ -314,9 +317,8 @@ const styles = StyleSheet.create({
   },
   ninersText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#333",
-    fontStyle: "italic",
+    fontFamily: "Medium",
+    color: color.black,
   },
   shareSection: {
     alignItems: "center",
@@ -324,14 +326,13 @@ const styles = StyleSheet.create({
   },
   shareTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
+    fontFamily: "Bold",
+    color: color.black,
     marginBottom: 20,
   },
   socialButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 15,
   },
   socialButton: {
     width: 50,

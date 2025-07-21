@@ -33,8 +33,8 @@ export default function TestResults2() {
       { rank: "1-9", percentage: 1 },
     ],
     all: [
-      { rank: "1", percentage: 23 },
-      { rank: "1-2", percentage: 19 },
+      { rank: "1", percentage: 37 },
+      { rank: "1-2", percentage: 31 },
       { rank: "1-3", percentage: 18 },
       { rank: "1-4", percentage: 16 },
       { rank: "1-5", percentage: 14 },
@@ -136,9 +136,9 @@ export default function TestResults2() {
 
         {/* Statistics Header */}
         <View style={styles.statisticsHeader}>
-          <Text style={styles.statisticsTitle}>Statistics</Text>
+          <Text style={styles.statisticsTitle}>Statistics </Text>
           <Text style={styles.statisticsSubtitle}>
-            Click on bars to see people
+            ( Click on bars to see people )
           </Text>
         </View>
 
@@ -221,6 +221,9 @@ const styles = StyleSheet.create({
     fontFamily: "SemiBold",
   },
   statisticsHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   statisticsTitle: {
