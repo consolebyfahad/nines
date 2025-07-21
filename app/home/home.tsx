@@ -18,7 +18,6 @@ export default function Home() {
   const Menu = svgIcon.Menu;
   const [selectedImages, setSelectedImages] = useState(new Set());
 
-  // Mock participant data - replace with actual backend data
   const participants = [
     {
       id: 1,
@@ -36,10 +35,9 @@ export default function Home() {
         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     },
   ];
-  const totalParticipants = 12; // Total number from backend
+  const totalParticipants = 12;
   const remainingCount = totalParticipants - participants.length;
 
-  // Mock celebrity data - replace with actual backend data
   const celebrities = [
     {
       id: 1,
@@ -152,14 +150,12 @@ export default function Home() {
           <Text style={styles.date}>Today 11 July</Text>
         </View>
 
-        <View style={styles.profilePicture}>
-          <Image
-            source={{
-              uri: "https://www.shutterstock.com/image-photo/head-shot-portrait-close-smiling-600nw-1714666150.jpg",
-            }}
-            style={styles.profileImage}
-          />
-        </View>
+        <Image
+          source={{
+            uri: "https://www.shutterstock.com/image-photo/head-shot-portrait-close-smiling-600nw-1714666150.jpg",
+          }}
+          style={styles.profileImage}
+        />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -217,7 +213,12 @@ export default function Home() {
         <View style={styles.imageGrid}>{renderCelebrityGrid()}</View>
 
         {/* Submit Button */}
-        <CustomButton title="Submit" onPress={handleSubmit} />
+        <CustomButton
+          title="Submit"
+          onPress={handleSubmit}
+          customStyle={styles.submitButton}
+          customTextStyle={styles.submitButtonText}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -258,14 +259,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
   },
-  profilePicture: {
-    width: 40,
-    height: 40,
-  },
   profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 52,
+    height: 52,
+    borderRadius: 99,
   },
   content: {
     flex: 1,
@@ -286,11 +283,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   challengeTitle: {
-    fontSize: 28,
-    fontFamily: "SemiBold",
+    fontSize: 32,
+    fontFamily: "Medium",
     color: color.black,
-    marginBottom: 15,
-    lineHeight: 28,
+    marginBottom: 24,
+    lineHeight: 38,
   },
   participantsRow: {
     flexDirection: "row",
@@ -355,12 +352,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 8,
     marginBottom: 40,
+    width: "80%",
+    alignSelf: "center",
   },
   imageContainer: {
     width: "33.33%",
     aspectRatio: 1,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: color.primary,
+    marginRight: -3,
+    marginBottom: -3,
   },
   celebrityImageWrapper: {
     flex: 1,
@@ -374,8 +375,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 6,
     left: 6,
-    width: 20,
-    height: 20,
+    width: 16,
+    height: 16,
     backgroundColor: color.white,
     borderRadius: 4,
     borderWidth: 1,
@@ -387,15 +388,9 @@ const styles = StyleSheet.create({
     backgroundColor: color.primary,
   },
   submitButton: {
-    backgroundColor: "#5A7A95",
-    paddingVertical: 18,
-    borderRadius: 25,
     alignItems: "center",
-    marginBottom: 30,
   },
   submitButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "Medium",
   },
 });

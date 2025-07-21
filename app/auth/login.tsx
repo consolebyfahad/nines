@@ -19,7 +19,6 @@ export default function AuthScreen() {
   const Apple = svgIcon.Apple;
   const Google = svgIcon.Google;
 
-  // State to manage signup/login mode
   const [isSignup, setIsSignup] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -46,10 +45,8 @@ export default function AuthScreen() {
   };
 
   const handleAlternateAction = () => {
-    // Toggle between signup and login modes
     setIsSignup(!isSignup);
 
-    // Reset form fields when switching modes
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -121,7 +118,7 @@ export default function AuthScreen() {
         >
           <Octicons
             name={showPassword ? "eye-closed" : "eye"}
-            size={24}
+            size={18}
             color={color.gray}
           />
         </TouchableOpacity>
@@ -144,7 +141,7 @@ export default function AuthScreen() {
           >
             <Octicons
               name={showConfirmPassword ? "eye-closed" : "eye"}
-              size={24}
+              size={18}
               color={color.gray}
             />
           </TouchableOpacity>
@@ -205,6 +202,8 @@ export default function AuthScreen() {
         title={isSignup ? "Create Account" : "Login"}
         onPress={handlePrimaryAction}
         variant="primary"
+        customStyle={styles.loginButton}
+        customTextStyle={styles.loginButtonText}
       />
 
       {/* Alternate Action Link */}
@@ -232,14 +231,16 @@ export default function AuthScreen() {
           title={"Apple"}
           variant="secondary"
           icon={Apple}
-          customStyle={{ width: "49%" }}
+          customStyle={styles.socialIcon}
+          customTextStyle={styles.socialButtonText}
           onPress={handleAppleLogin}
         />
         <CustomButton
           title={"Google"}
           variant="secondary"
           icon={Google}
-          customStyle={{ width: "49%" }}
+          customStyle={styles.socialIcon}
+          customTextStyle={styles.socialButtonText}
           onPress={handleGoogleLogin}
         />
       </View>
@@ -259,13 +260,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 28,
-    fontFamily: "Bold",
+    fontSize: 24,
+    fontFamily: "SemiBold",
     color: color.primary,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: "Medium",
     color: color.black,
     marginBottom: 40,
   },
@@ -276,6 +278,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
+    fontFamily: "Regular",
     height: 56,
     backgroundColor: color.secondary100,
     borderRadius: 12,
@@ -287,10 +290,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     top: 18,
-  },
-  eyeIcon: {
-    fontSize: 20,
-    opacity: 0.6,
   },
   rememberContainer: {
     width: "100%",
@@ -304,11 +303,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkbox: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     borderRadius: 4,
-    borderWidth: 2,
-    borderColor: color.white,
     marginRight: 8,
     alignItems: "center",
     justifyContent: "center",
@@ -329,7 +326,8 @@ const styles = StyleSheet.create({
   },
   forgotText: {
     fontSize: 14,
-    color: color.black,
+    color: color.primary,
+    fontFamily: "Regular",
     textDecorationLine: "underline",
   },
   termsContainer: {
@@ -354,20 +352,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: color.primary,
     lineHeight: 20,
+    fontFamily: "Regular",
   },
-  primaryButton: {
-    width: "100%",
-    height: 56,
-    backgroundColor: "#5B7C99",
-    borderRadius: 12,
+  loginButton: {
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
   },
-  primaryButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
+  loginButtonText: {
+    fontFamily: "Regular",
+  },
+  socialIcon: {
+    alignItems: "center",
+    width: "49%",
+    backgroundColor: color.secondary100,
+  },
+  socialButtonText: {
+    fontFamily: "Medium",
+    color: color.gray100,
   },
   alternateContainer: {
     flexDirection: "row",
@@ -406,37 +406,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
-  },
-  socialButton: {
-    flex: 0.48,
-    height: 56,
-    backgroundColor: "#F9FAFB",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  appleIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  googleIcon: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#4285F4",
-    marginRight: 8,
-    backgroundColor: "#FFF",
-    width: 20,
-    height: 20,
-    textAlign: "center",
-    textAlignVertical: "center",
-    borderRadius: 10,
-  },
-  socialButtonText: {
-    fontSize: 16,
-    color: "#374151",
-    fontWeight: "500",
   },
 });

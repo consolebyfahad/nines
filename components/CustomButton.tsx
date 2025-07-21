@@ -6,6 +6,7 @@ type CustomButtonProps = {
   title: string;
   onPress: () => void;
   customStyle?: object;
+  customTextStyle?: object;
   iconbg?: boolean;
   variant?: "primary" | "secondary";
   icon?: React.ComponentType<{ width: number; height: number }>;
@@ -16,15 +17,18 @@ export default function CustomButton({
   title,
   onPress,
   customStyle,
+  customTextStyle,
   iconbg = false,
   variant = "primary",
   icon: IconComponent,
   disabled = false,
 }: CustomButtonProps) {
   const buttonStyle =
-    variant === "primary" ? styles.phoneButton : styles.googleButton;
+    variant === "primary" ? styles.primaryButton : styles.secondaryButton;
   const textStyle =
-    variant === "primary" ? styles.phoneButtonText : styles.googleButtonText;
+    variant === "primary"
+      ? styles.primaryButtonText
+      : styles.secondaryButtonText;
 
   return (
     <TouchableOpacity
@@ -38,45 +42,50 @@ export default function CustomButton({
             <IconComponent width={20} height={20} />
           </View>
         )}
-        <Text style={textStyle}>{title}</Text>
+        <Text style={[textStyle, customTextStyle]}>{title}</Text>
+        <View></View>
       </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  phoneButton: {
+  primaryButton: {
     width: "100%",
     height: 55,
     backgroundColor: color.primary,
     borderRadius: 12,
-    alignItems: "center",
+    padding: 8,
+    // alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
   },
-  googleButton: {
+  secondaryButton: {
     width: "100%",
     height: 55,
     backgroundColor: color.secondary,
     borderRadius: 12,
-    alignItems: "center",
+    // alignItems: "center",
+    padding: 8,
     justifyContent: "center",
     marginBottom: 30,
   },
-  phoneButtonText: {
+  primaryButtonText: {
     color: color.white,
     fontSize: 18,
     fontFamily: "Bold",
+    textAlign: "center",
   },
-  googleButtonText: {
+  secondaryButtonText: {
     color: color.primary,
     fontSize: 18,
     fontFamily: "Bold",
+    textAlign: "center",
   },
   buttonContent: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
   iconContainer: {
     padding: 8,

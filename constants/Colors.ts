@@ -27,6 +27,7 @@ export const color = {
   secondary: "#D5E9F8",
   secondary100: "#F5F9FE",
   gray: "#E0E5EC",
+  gray100: "#61677D",
   success: "#34A853",
   bg: "#E8F5FF",
 };

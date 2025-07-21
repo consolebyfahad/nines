@@ -13,11 +13,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function TestResults() {
+export default function TestResults2() {
   const Youtube = svgIcon.Youtube;
   const Facebook = svgIcon.Facebook;
   const Tiktok = svgIcon.Tiktok;
   const Instagram = svgIcon.Instagram;
+
   // Mock data - replace with actual backend data
   const resultsData = {
     friends: [
@@ -56,6 +57,64 @@ export default function TestResults() {
     console.log(`Share on ${platform}`);
   };
 
+  const renderChart = (data: any, title: string, type: string) => (
+    <View style={styles.separateChartContainer}>
+      <View style={styles.chartHeader}>
+        <Text style={styles.chartTitle}>Statistics</Text>
+        <Text style={styles.chartSubtitle}>
+          Based on {title === "Friends" ? "friends" : "all people"}
+        </Text>
+      </View>
+
+      <View style={styles.chartContent}>
+        {/* Vertical Grid Background */}
+        <View style={styles.verticalGridBackground}>
+          {Array.from({ length: 10 }, (_, i) => (
+            <View
+              key={i}
+              style={[styles.verticalGridLine, { left: `${(i + 1) * 10}%` }]}
+            />
+          ))}
+        </View>
+
+        {/* Progress Bars */}
+        <View style={styles.barsContainer}>
+          {data.map((item: any, index: number) => {
+            const isLast = index === data.length - 1;
+            return (
+              <View key={item.rank} style={styles.barRow}>
+                <Text style={styles.rankLabel}>{item.rank}</Text>
+                <TouchableOpacity
+                  style={styles.enhancedBarContainer}
+                  onPress={() => handleBarPress(item.rank, type)}
+                >
+                  <View style={styles.enhancedProgressBackground}>
+                    <View
+                      style={[
+                        styles.enhancedProgressFill,
+                        { width: `${item.percentage}%` },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.enhancedPercentageText}>
+                    {item.percentage}%
+                  </Text>
+                </TouchableOpacity>
+                {isLast && (
+                  <Text style={styles.enhancedNinersText}>Niners!</Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.chartFooter}>
+        <Text style={styles.chartFooterTitle}>{title}</Text>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
@@ -83,83 +142,13 @@ export default function TestResults() {
           </Text>
         </View>
 
-        {/* Results Chart */}
-        <View style={styles.chartContainer}>
-          {/* Column Headers */}
-          <View style={styles.columnHeaders}>
-            <View style={styles.rankColumn}>
-              <Text style={styles.columnHeaderText}></Text>
-            </View>
-            <View style={styles.dataColumn}>
-              <Text style={styles.columnHeaderText}>Friends</Text>
-            </View>
-            <View style={styles.dataColumn}>
-              <Text style={styles.columnHeaderText}>All</Text>
-            </View>
-          </View>
-
-          {/* Progress Bars */}
-          {resultsData.friends.map((friendData, index) => {
-            const allData = resultsData.all[index];
-            const isLast = index === resultsData.friends.length - 1;
-
-            return (
-              <View key={friendData.rank} style={styles.chartRow}>
-                <View style={styles.rankColumn}>
-                  <Text style={styles.rankText}>{friendData.rank}</Text>
-                </View>
-
-                <View style={styles.dataColumn}>
-                  <TouchableOpacity
-                    style={styles.barContainer}
-                    onPress={() => handleBarPress(friendData.rank, "friends")}
-                  >
-                    <View style={styles.progressBarBackground}>
-                      <View
-                        style={[
-                          styles.progressBarFill,
-                          { width: `${friendData.percentage}%` },
-                        ]}
-                      />
-                    </View>
-                    <Text style={styles.percentageText}>
-                      {friendData.percentage}%
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.dataColumn}>
-                  <TouchableOpacity
-                    style={styles.barContainer}
-                    onPress={() => handleBarPress(allData.rank, "all")}
-                  >
-                    <View style={styles.progressBarBackground}>
-                      <View
-                        style={[
-                          styles.progressBarFill,
-                          { width: `${allData.percentage}%` },
-                        ]}
-                      />
-                    </View>
-                    <Text style={styles.percentageText}>
-                      {allData.percentage}%
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {isLast && (
-                  <View style={styles.ninersContainer}>
-                    <Text style={styles.ninersText}>Niners!</Text>
-                  </View>
-                )}
-              </View>
-            );
-          })}
-        </View>
+        {/* Enhanced Charts */}
+        {renderChart(resultsData.friends, "Friends", "friends")}
+        {renderChart(resultsData.all, "All", "all")}
 
         {/* Share Section */}
         <View style={styles.shareSection}>
-          <Text style={styles.shareTitle}>{`Share Today's Results`}</Text>
+          <Text style={styles.shareTitle}>Share</Text>
           <View style={styles.socialButtons}>
             <TouchableOpacity
               style={styles.socialButton}
@@ -217,7 +206,6 @@ const styles = StyleSheet.create({
     color: color.black,
     marginLeft: 10,
   },
-
   content: {
     flex: 1,
     paddingHorizontal: 20,
@@ -248,90 +236,128 @@ const styles = StyleSheet.create({
     fontFamily: "Regular",
     color: color.black,
   },
-  chartContainer: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 40,
+  separateChartContainer: {
+    backgroundColor: "#E3F2FD",
+    borderRadius: 12,
+    marginBottom: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
   },
-  columnHeaders: {
-    flexDirection: "row",
+  chartHeader: {
     marginBottom: 15,
   },
-  columnHeaderText: {
+  chartTitle: {
     fontSize: 16,
     fontFamily: "SemiBold",
     color: color.black,
-    textAlign: "center",
+    textAlign: "left",
   },
-  chartRow: {
+  chartSubtitle: {
+    fontSize: 12,
+    fontFamily: "Regular",
+    color: "#666",
+    textAlign: "left",
+    marginTop: 2,
+  },
+  chartContent: {
+    position: "relative",
+    paddingVertical: 10,
+  },
+  verticalGridBackground: {
+    position: "absolute",
+    top: 0,
+    left: 45,
+    right: 40,
+    bottom: 0,
+  },
+  verticalGridLine: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 0.5,
+    backgroundColor: color.primary,
+    opacity: 0.4,
+  },
+  barsContainer: {
+    paddingVertical: 5,
+  },
+  barRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 8,
     position: "relative",
   },
-  rankColumn: {
-    width: 40,
-    alignItems: "flex-start",
-  },
-  dataColumn: {
-    flex: 1,
-    marginHorizontal: 10,
-  },
-  rankText: {
+  rankLabel: {
     fontSize: 16,
     fontFamily: "SemiBold",
     color: color.black,
+    width: 35,
+    textAlign: "left",
   },
-  barContainer: {
+  enhancedBarContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginLeft: 10,
   },
-  progressBarBackground: {
+  enhancedProgressBackground: {
     flex: 1,
-    height: 24,
-    borderRadius: 2,
+    height: 22,
+    borderRadius: 3,
     overflow: "hidden",
-    marginRight: 10,
+    marginRight: 8,
   },
-  progressBarFill: {
+  enhancedProgressFill: {
     height: "100%",
     backgroundColor: color.success,
     borderRadius: 2,
+    shadowColor: color.success,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  percentageText: {
+  enhancedPercentageText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
+    fontFamily: "SemiBold",
+    color: color.black,
     minWidth: 35,
     textAlign: "right",
   },
-  ninersContainer: {
+  enhancedNinersText: {
     position: "absolute",
-    right: 10,
-    bottom: -20,
-  },
-  ninersText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#333",
+    right: 0,
+    bottom: -18,
+    fontSize: 11,
+    fontFamily: "SemiBold",
+    color: color.black,
     fontStyle: "italic",
+  },
+  chartFooter: {
+    paddingTop: 15,
+    paddingLeft: 5,
+  },
+  chartFooterTitle: {
+    fontSize: 16,
+    fontFamily: "SemiBold",
+    color: color.black,
+    textAlign: "left",
   },
   shareSection: {
     alignItems: "center",
     marginBottom: 40,
+    marginTop: 20,
   },
   shareTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
+    fontFamily: "SemiBold",
+    color: color.black,
     marginBottom: 20,
   },
   socialButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 15,
   },
   socialButton: {
     width: 50,

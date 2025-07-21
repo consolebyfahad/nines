@@ -23,21 +23,17 @@ export default function Onboarding() {
   };
 
   const handleGoogleLogin = () => {
-    // Handle Google login
     console.log("Google login pressed");
   };
 
   const handleSignUp = () => {
     router.push({ pathname: "/auth/login", params: { mode: "signup" } });
-    // console.log("Sign up pressed");
   };
 
   return (
     <View style={styles.container}>
       {/* Top Image Area */}
-      <View style={styles.imageContainer}>
-        <Image source={image.onboarding} style={styles.onboardingImage} />
-      </View>
+      <Image source={image.onboarding} style={styles.onboardingImage} />
 
       {/* Title */}
       <Text style={styles.title}>
@@ -78,30 +74,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: color.bg,
     alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  imageContainer: {
-    width: width,
-    height: height * 0.55,
-    alignItems: "center",
     justifyContent: "center",
-    position: "relative",
+    padding: 24,
   },
   onboardingImage: {
-    width: "80%",
-    height: "65%",
+    width: width * 0.78,
+    height: height * 0.35,
     resizeMode: "cover",
+    marginBottom: 12,
   },
   title: {
     fontSize: 28,
     fontFamily: "Bold",
     color: color.black,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 30,
     lineHeight: 35,
   },
   buttonContainer: {
-    width: "80%",
+    width: "76%",
   },
   signUpContainer: {
     flexDirection: "row",
@@ -109,11 +100,12 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     color: color.black,
-    fontSize: 16,
+    fontFamily: "Regular",
+    fontSize: 14,
   },
   signUpLink: {
     color: color.primary,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    fontFamily: "SemiBold",
   },
 });
