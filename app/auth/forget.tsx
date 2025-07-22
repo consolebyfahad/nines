@@ -44,7 +44,7 @@ export default function Forget() {
       </View>
 
       {/* Title */}
-      <Text style={styles.title}>Forgot Password? 🔒</Text>
+      <Text style={styles.title}>Forgot Password?</Text>
 
       {/* Subtitle */}
       <Text style={styles.subtitle}>
@@ -70,6 +70,7 @@ export default function Forget() {
         title="Send Reset Link"
         onPress={handleSendResetLink}
         variant="primary"
+        customStyle={styles.resetLink}
       />
 
       {/* Back to Login Link */}
@@ -135,6 +136,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     color: color.black,
+  },
+  resetLink: {
+    alignItems: "center",
   },
   backToLoginContainer: {
     flexDirection: "row",

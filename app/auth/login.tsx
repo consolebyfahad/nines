@@ -1,4 +1,5 @@
 import CustomButton from "@/components/CustomButton";
+import SocailLogin from "@/components/socailLogin";
 import { color } from "@/constants/Colors";
 import { svgIcon } from "@/constants/Images";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -16,8 +17,6 @@ import {
 export default function AuthScreen() {
   const router = useRouter();
   const Logo = svgIcon.Logo;
-  const Apple = svgIcon.Apple;
-  const Google = svgIcon.Google;
   const { mode } = useLocalSearchParams();
   const [isSignup, setIsSignup] = useState(mode === "signup");
 
@@ -60,14 +59,6 @@ export default function AuthScreen() {
     } else {
       console.log("Switch to Sign Up");
     }
-  };
-
-  const handleAppleLogin = () => {
-    console.log("Apple login pressed");
-  };
-
-  const handleGoogleLogin = () => {
-    console.log("Google login pressed");
   };
 
   return (
@@ -227,22 +218,7 @@ export default function AuthScreen() {
 
       {/* Social Login Buttons */}
       <View style={styles.socialContainer}>
-        <CustomButton
-          title={"Apple"}
-          variant="secondary"
-          icon={Apple}
-          customStyle={styles.socialIcon}
-          customTextStyle={styles.socialButtonText}
-          onPress={handleAppleLogin}
-        />
-        <CustomButton
-          title={"Google"}
-          variant="secondary"
-          icon={Google}
-          customStyle={styles.socialIcon}
-          customTextStyle={styles.socialButtonText}
-          onPress={handleGoogleLogin}
-        />
+        <SocailLogin />
       </View>
     </ScrollView>
   );
@@ -359,15 +335,6 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     fontFamily: "Regular",
-  },
-  socialIcon: {
-    alignItems: "center",
-    width: "49%",
-    backgroundColor: color.secondary100,
-  },
-  socialButtonText: {
-    fontFamily: "Medium",
-    color: color.gray100,
   },
   alternateContainer: {
     flexDirection: "row",

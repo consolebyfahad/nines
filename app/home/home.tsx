@@ -110,6 +110,10 @@ export default function Home() {
     console.log("Press Submit");
   };
 
+  const handleProfile = () => {
+    router.push("/profile/profile");
+  };
+
   const renderCelebrityGrid = () => {
     return celebrities.map((celebrity) => (
       <TouchableOpacity
@@ -150,12 +154,14 @@ export default function Home() {
           <Text style={styles.date}>Today 11 July</Text>
         </View>
 
-        <Image
-          source={{
-            uri: "https://www.shutterstock.com/image-photo/head-shot-portrait-close-smiling-600nw-1714666150.jpg",
-          }}
-          style={styles.profileImage}
-        />
+        <TouchableOpacity onPress={handleProfile}>
+          <Image
+            source={{
+              uri: "https://www.shutterstock.com/image-photo/head-shot-portrait-close-smiling-600nw-1714666150.jpg",
+            }}
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
