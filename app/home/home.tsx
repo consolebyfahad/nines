@@ -1,11 +1,13 @@
 import CustomButton from "@/components/CustomButton";
 import { color } from "@/constants/Colors";
 import { image, svgIcon } from "@/constants/Images";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Dimensions,
   Image,
+  PanResponder,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,9 +16,20 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const { width: screenWidth } = Dimensions.get("window");
+
 export default function Home() {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragTrigger, setDragTrigger] = useState<number | null>(null);
+  const draggingRef = useRef<number | null>(null);
   const Menu = svgIcon.Menu;
-  const [selectedImages, setSelectedImages] = useState(new Set());
+  const gridRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (dragTrigger !== null) {
+      setDraggedIndex(dragTrigger);
+    }
+  }, [dragTrigger]);
 
   const participants = [
     {
@@ -38,7 +51,7 @@ export default function Home() {
   const totalParticipants = 12;
   const remainingCount = totalParticipants - participants.length;
 
-  const celebrities = [
+  const initialCelebrities = [
     {
       id: 1,
       image:
@@ -95,49 +108,170 @@ export default function Home() {
     },
   ];
 
-  const toggleImageSelection = (celebrityId: any) => {
-    const newSelected = new Set(selectedImages);
-    if (newSelected.has(celebrityId)) {
-      newSelected.delete(celebrityId);
-    } else {
-      newSelected.add(celebrityId);
+  const [celebrities, setCelebrities] = useState(initialCelebrities);
+
+  // Calculate grid dimensions
+  const gridWidth = screenWidth * 0.8;
+  const itemWidth = gridWidth / 3;
+
+  const swapCelebrities = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+
+    setCelebrities((prevCelebrities) => {
+      const newCelebrities = [...prevCelebrities];
+      [newCelebrities[fromIndex], newCelebrities[toIndex]] = [
+        newCelebrities[toIndex],
+        newCelebrities[fromIndex],
+      ];
+      return newCelebrities;
+    });
+  };
+
+  const getPositionFromCoordinates = (
+    absoluteX: number,
+    absoluteY: number,
+    callback: (dropIndex: number) => void
+  ) => {
+    if (!gridRef.current) {
+      callback(-1);
+      return;
     }
-    setSelectedImages(newSelected);
+
+    gridRef.current.measure((x, y, width, height, pageX, pageY) => {
+      // Calculate relative coordinates within the grid
+      const relativeX = absoluteX - pageX - 8; // Subtract grid padding
+      const relativeY = absoluteY - pageY - 8; // Subtract grid padding
+
+      // Check if the drop point is within grid boundaries
+      if (
+        relativeX < 0 ||
+        relativeY < 0 ||
+        relativeX > width - 16 || // Account for padding
+        relativeY > height - 16
+      ) {
+        callback(-1); // Invalid drop position
+        return;
+      }
+
+      const col = Math.floor(relativeX / itemWidth);
+      const row = Math.floor(relativeY / itemWidth);
+
+      const clampedCol = Math.max(0, Math.min(2, col));
+      const clampedRow = Math.max(0, Math.min(2, row));
+
+      const newIndex = clampedRow * 3 + clampedCol;
+      const validIndex = Math.max(0, Math.min(8, newIndex));
+
+      callback(validIndex);
+    });
   };
 
   const handleSubmit = () => {
     router.push("/home/testResults");
-    console.log("Press Submit");
+    console.log(
+      "Final Ranking:",
+      celebrities.map((c, i) => ({
+        position: i + 1,
+        celebrity: c.name,
+      }))
+    );
   };
 
   const handleProfile = () => {
     router.push("/profile/profile");
   };
 
-  const renderCelebrityGrid = () => {
-    return celebrities.map((celebrity) => (
-      <TouchableOpacity
-        key={celebrity.id}
-        style={styles.imageContainer}
-        onPress={() => toggleImageSelection(celebrity.id)}
+  const DraggableImage = ({
+    celebrity,
+    index,
+  }: {
+    celebrity: any;
+    index: number;
+  }) => {
+    const pan = useRef(new Animated.ValueXY()).current;
+    const scale = useRef(new Animated.Value(1)).current;
+
+    const panResponder = PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        draggingRef.current = index;
+        setDragTrigger(index);
+        pan.setOffset({
+          x: (pan.x as any)._value,
+          y: (pan.y as any)._value,
+        });
+        Animated.spring(scale, {
+          toValue: 1.1,
+          useNativeDriver: false,
+        }).start();
+      },
+      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: (evt) => {
+        pan.flattenOffset();
+
+        // Get drop position using improved coordinate calculation
+        getPositionFromCoordinates(
+          evt.nativeEvent.pageX,
+          evt.nativeEvent.pageY,
+          (dropIndex) => {
+            // Only swap if it's a valid drop position and different from current
+            if (dropIndex !== -1 && dropIndex !== index) {
+              swapCelebrities(index, dropIndex);
+            }
+
+            // Reset animations
+            Animated.parallel([
+              Animated.spring(pan, {
+                toValue: { x: 0, y: 0 },
+                useNativeDriver: false,
+              }),
+              Animated.spring(scale, {
+                toValue: 1,
+                useNativeDriver: false,
+              }),
+            ]).start();
+          }
+        );
+      },
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.imageContainer,
+          {
+            transform: [
+              { translateX: pan.x },
+              { translateY: pan.y },
+              { scale: scale },
+            ],
+            zIndex: draggedIndex === index ? 1000 : 1,
+          },
+        ]}
+        {...panResponder.panHandlers}
       >
         <View style={styles.celebrityImageWrapper}>
           <Image
             source={{ uri: celebrity.image }}
             style={styles.celebrityImage}
           />
-          <View
-            style={[
-              styles.checkbox,
-              selectedImages.has(celebrity.id) && styles.checked,
-            ]}
-          >
-            {selectedImages.has(celebrity.id) ? (
-              <Ionicons name="checkmark" size={14} color={color.white} />
-            ) : null}
+          <View style={styles.numberBox}>
+            <Text style={styles.numberText}>{index + 1}</Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
+  const renderCelebrityGrid = () => {
+    return celebrities.map((celebrity, index) => (
+      <DraggableImage
+        key={`${celebrity.id}-${index}`}
+        celebrity={celebrity}
+        index={index}
+      />
     ));
   };
 
@@ -215,8 +349,10 @@ export default function Home() {
           style={styles.topicTitle}
         >{`Today's topic: Male celebrities`}</Text>
 
-        {/* Celebrity Grid */}
-        <View style={styles.imageGrid}>{renderCelebrityGrid()}</View>
+        {/* Celebrity Grid - Added ref for position measurement */}
+        <View ref={gridRef} style={styles.imageGrid}>
+          {renderCelebrityGrid()}
+        </View>
 
         {/* Submit Button */}
         <CustomButton
@@ -377,12 +513,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  checkbox: {
+  numberBox: {
     position: "absolute",
     top: 6,
     left: 6,
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
     backgroundColor: color.white,
     borderRadius: 4,
     borderWidth: 1,
@@ -390,8 +526,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  checked: {
-    backgroundColor: color.primary,
+  numberText: {
+    fontSize: 12,
+    fontFamily: "SemiBold",
+    color: color.black,
   },
   submitButton: {
     alignItems: "center",

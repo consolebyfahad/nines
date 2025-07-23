@@ -1,4 +1,3 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { persistor, store } from "@/redux/store";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -8,8 +7,6 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   const [loaded] = useFonts({
     Regular: require("../assets/fonts/Hellix-Regular.ttf"),
     Medium: require("../assets/fonts/Hellix-Medium.ttf"),
@@ -25,7 +22,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Stack
-          initialRouteName="auth/onboarding"
+          initialRouteName="index"
           screenOptions={{ headerShown: false }}
         />
         <StatusBar style="auto" />

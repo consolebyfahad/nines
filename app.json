@@ -18,7 +18,8 @@
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.abdulhannan96.nines"
     },
     "web": {
       "bundler": "metro",
