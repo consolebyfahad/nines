@@ -2,10 +2,14 @@ import CustomButton from "@/components/CustomButton";
 import SocailLogin from "@/components/socailLogin";
 import { color } from "@/constants/Colors";
 import { svgIcon } from "@/constants/Images";
+import { clearError, loginUser, registerUser } from "@/redux/slices/authSlice";
+import { AppDispatch, RootState } from "@/redux/store";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,9 +17,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function AuthScreen() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, isLoading, error, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   const Logo = svgIcon.Logo;
   const { mode } = useLocalSearchParams();
   const [isSignup, setIsSignup] = useState(mode === "signup");
@@ -28,13 +38,109 @@ export default function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handlePrimaryAction = () => {
+  // Clear error when component mounts or mode changes
+  useEffect(() => {
+    dispatch(clearError());
+  }, [isSignup, dispatch]);
+
+  // Navigate to home if authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      router.replace("/home/home");
+    }
+  }, [isAuthenticated, user, router]);
+
+  // Show error alert
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Authentication Error", getErrorMessage(error), [
+        { text: "OK", onPress: () => dispatch(clearError()) },
+      ]);
+    }
+  }, [error, dispatch]);
+
+  const getErrorMessage = (error: string) => {
+    if (error.includes("invalid-email")) {
+      return "Please enter a valid email address.";
+    } else if (error.includes("user-disabled")) {
+      return "This account has been disabled.";
+    } else if (error.includes("user-not-found")) {
+      return "No account found with this email address.";
+    } else if (error.includes("wrong-password")) {
+      return "Incorrect password. Please try again.";
+    } else if (error.includes("email-already-in-use")) {
+      return "An account with this email already exists.";
+    } else if (error.includes("weak-password")) {
+      return "Password should be at least 6 characters long.";
+    } else if (error.includes("too-many-requests")) {
+      return "Too many failed attempts. Please try again later.";
+    }
+    return error;
+  };
+
+  const validateForm = () => {
+    if (!email.trim()) {
+      Alert.alert("Validation Error", "Please enter your email address.");
+      return false;
+    }
+
+    if (!email.includes("@")) {
+      Alert.alert("Validation Error", "Please enter a valid email address.");
+      return false;
+    }
+
+    if (!password.trim()) {
+      Alert.alert("Validation Error", "Please enter your password.");
+      return false;
+    }
+
+    if (password.length < 6) {
+      Alert.alert(
+        "Validation Error",
+        "Password must be at least 6 characters long."
+      );
+      return false;
+    }
+
     if (isSignup) {
-      router.push("/home/home");
-      console.log("Create account pressed");
-    } else {
-      router.push("/home/home");
-      console.log("Login pressed");
+      if (!confirmPassword.trim()) {
+        Alert.alert("Validation Error", "Please confirm your password.");
+        return false;
+      }
+
+      if (password !== confirmPassword) {
+        Alert.alert("Validation Error", "Passwords do not match.");
+        return false;
+      }
+
+      if (!agreeToTerms) {
+        Alert.alert(
+          "Validation Error",
+          "Please agree to the Terms of Service and Privacy Policy."
+        );
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handlePrimaryAction = async () => {
+    if (!validateForm()) return;
+
+    try {
+      if (isSignup) {
+        await dispatch(
+          registerUser({ email: email.trim(), password })
+        ).unwrap();
+        console.log("Account created successfully");
+      } else {
+        await dispatch(loginUser({ email: email.trim(), password })).unwrap();
+        console.log("Login successful");
+      }
+    } catch (error) {
+      // Error is handled by useEffect above
+      console.log("Authentication error:", error);
     }
   };
 
@@ -46,6 +152,7 @@ export default function AuthScreen() {
   const handleAlternateAction = () => {
     setIsSignup(!isSignup);
 
+    // Clear form
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -53,6 +160,9 @@ export default function AuthScreen() {
     setAgreeToTerms(false);
     setShowPassword(false);
     setShowConfirmPassword(false);
+
+    // Clear any existing errors
+    dispatch(clearError());
 
     if (isSignup) {
       console.log("Switch to Sign In");
@@ -87,9 +197,13 @@ export default function AuthScreen() {
           placeholder="Email Address"
           placeholderTextColor="#A0A0A0"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            if (error) dispatch(clearError());
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!isLoading}
         />
       </View>
 
@@ -100,12 +214,17 @@ export default function AuthScreen() {
           placeholder="Password"
           placeholderTextColor="#A0A0A0"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (error) dispatch(clearError());
+          }}
           secureTextEntry={!showPassword}
+          editable={!isLoading}
         />
         <TouchableOpacity
           style={styles.eyeButton}
           onPress={() => setShowPassword(!showPassword)}
+          disabled={isLoading}
         >
           <Octicons
             name={showPassword ? "eye-closed" : "eye"}
@@ -123,12 +242,17 @@ export default function AuthScreen() {
             placeholder="Confirm Password"
             placeholderTextColor="#A0A0A0"
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              if (error) dispatch(clearError());
+            }}
             secureTextEntry={!showConfirmPassword}
+            editable={!isLoading}
           />
           <TouchableOpacity
             style={styles.eyeButton}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            disabled={isLoading}
           >
             <Octicons
               name={showConfirmPassword ? "eye-closed" : "eye"}
@@ -145,6 +269,7 @@ export default function AuthScreen() {
           <TouchableOpacity
             style={styles.checkboxContainer}
             onPress={() => setRememberMe(!rememberMe)}
+            disabled={isLoading}
           >
             <View
               style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
@@ -154,7 +279,7 @@ export default function AuthScreen() {
             <Text style={styles.rememberText}>Remember me</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleForgotPassword}>
+          <TouchableOpacity onPress={handleForgotPassword} disabled={isLoading}>
             <Text style={styles.forgotText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
@@ -166,6 +291,7 @@ export default function AuthScreen() {
           <TouchableOpacity
             style={styles.checkboxContainer}
             onPress={() => setAgreeToTerms(!agreeToTerms)}
+            disabled={isLoading}
           >
             <View
               style={[styles.checkbox, agreeToTerms && styles.checkboxChecked]}
@@ -175,12 +301,11 @@ export default function AuthScreen() {
           </TouchableOpacity>
           <View style={styles.termsTextContainer}>
             <Text style={styles.termsText}>{`I'm agree to `}</Text>
-            <TouchableOpacity>
+            <TouchableOpacity disabled={isLoading}>
               <Text style={styles.termsLink}>The Terms of Service</Text>
             </TouchableOpacity>
             <Text style={styles.termsText}> and </Text>
-
-            <TouchableOpacity>
+            <TouchableOpacity disabled={isLoading}>
               <Text style={styles.termsLink}>Privacy Policy</Text>
             </TouchableOpacity>
           </View>
@@ -188,13 +313,29 @@ export default function AuthScreen() {
       )}
 
       {/* Primary Action Button */}
-
       <CustomButton
-        title={isSignup ? "Create Account" : "Login"}
+        title={
+          isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="white" size="small" />
+              <Text style={styles.loadingText}>
+                {isSignup ? "Creating Account..." : "Signing In..."}
+              </Text>
+            </View>
+          ) : isSignup ? (
+            "Create Account"
+          ) : (
+            "Login"
+          )
+        }
         onPress={handlePrimaryAction}
         variant="primary"
-        customStyle={styles.loginButton}
+        customStyle={[
+          styles.loginButton,
+          isLoading && styles.loginButtonDisabled,
+        ]}
         customTextStyle={styles.loginButtonText}
+        disabled={isLoading}
       />
 
       {/* Alternate Action Link */}
@@ -202,8 +343,10 @@ export default function AuthScreen() {
         <Text style={styles.alternateText}>
           {isSignup ? "Do you have account? " : "Don't have account? "}
         </Text>
-        <TouchableOpacity onPress={handleAlternateAction}>
-          <Text style={styles.alternateLink}>
+        <TouchableOpacity onPress={handleAlternateAction} disabled={isLoading}>
+          <Text
+            style={[styles.alternateLink, isLoading && styles.disabledText]}
+          >
             {isSignup ? "Sign In" : "Sign Up"}
           </Text>
         </TouchableOpacity>
@@ -333,7 +476,20 @@ const styles = StyleSheet.create({
   loginButton: {
     alignItems: "center",
   },
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
   loginButtonText: {
+    fontFamily: "Regular",
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    color: "white",
+    marginLeft: 8,
     fontFamily: "Regular",
   },
   alternateContainer: {
@@ -351,6 +507,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: color.primary,
     fontFamily: "SemiBold",
+  },
+  disabledText: {
+    opacity: 0.5,
   },
   dividerContainer: {
     flexDirection: "row",

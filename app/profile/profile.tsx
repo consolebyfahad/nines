@@ -1,5 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import { color } from "@/constants/Colors";
+import { logoutUser } from "@/redux/slices/authSlice";
+import { AppDispatch } from "@/redux/store";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -14,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
 
 export default function Profile() {
   const [name, setName] = useState("John Doe");
@@ -22,6 +25,7 @@ export default function Profile() {
     "https://www.shutterstock.com/image-photo/head-shot-portrait-close-smiling-600nw-1714666150.jpg"
   );
   const [isEditing, setIsEditing] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleEditProfile = () => {
     setIsEditing(!isEditing);
@@ -60,19 +64,29 @@ export default function Profile() {
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: () => {
-          router.replace("/auth/login");
-          console.log("User logged out");
-        },
-      },
-    ]);
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      console.log("Logged out successfully");
+      router.push("/auth/login");
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
   };
+
+  // const handleLogout = () => {
+  //   Alert.alert("Logout", "Are you sure you want to logout?", [
+  //     { text: "Cancel", style: "cancel" },
+  //     {
+  //       text: "Logout",
+  //       style: "destructive",
+  //       onPress: () => {
+  //         router.replace("/auth/login");
+  //         console.log("User logged out");
+  //       },
+  //     },
+  //   ]);
+  // };
 
   const handleBackPress = () => {
     router.back();

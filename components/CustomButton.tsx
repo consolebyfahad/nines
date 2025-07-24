@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type CustomButtonProps = {
-  title: string;
+  title: any;
   onPress: () => void;
   customStyle?: object;
   customTextStyle?: object;

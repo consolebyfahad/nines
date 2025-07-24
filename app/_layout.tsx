@@ -1,3 +1,4 @@
+import { AuthListener } from "@/components/AuthListener";
 import { persistor, store } from "@/redux/store";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -21,6 +22,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+        <AuthListener />
         <Stack
           initialRouteName="index"
           screenOptions={{ headerShown: false }}

@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Nines",
-    "slug": "nines",
+    "name": "The Nines",
+    "slug": "thenines",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
-    "scheme": "nines",
+    "scheme": "thenines",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.abdulhannan96.nines",
+      "bundleIdentifier": "com.thenines.app",
       "usesAppleSignIn": true
     },
     "android": {
@@ -19,7 +19,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.abdulhannan96.nines"
+      "package": "com.thenines.app"
     },
     "web": {
       "bundler": "metro",
